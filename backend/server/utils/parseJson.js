@@ -35,6 +35,41 @@ const isFilledString = (value) =>
   typeof value === "string" &&
   value.trim().length > 0;
 
+const INVALID_TEXT = "data tidak sesuai";
+
+const buildInvalidResult = () => ({
+  origin: INVALID_TEXT,
+  destination: INVALID_TEXT,
+  departureTime: INVALID_TEXT,
+  budget: INVALID_TEXT,
+  routes: [
+    {
+      title: INVALID_TEXT,
+      badge: INVALID_TEXT,
+      modes: [INVALID_TEXT],
+      duration: INVALID_TEXT,
+      cost: INVALID_TEXT,
+      transfers: INVALID_TEXT,
+      walking: INVALID_TEXT,
+      steps: [
+        {
+          instruction: INVALID_TEXT,
+          mode: INVALID_TEXT,
+          time: INVALID_TEXT,
+          duration: INVALID_TEXT,
+          stops: []
+        }
+      ]
+    }
+  ]
+});
+
+const isInvalidLocation = (value) => {
+  if (!isFilledString(value)) return true;
+  const normalized = value.trim().toLowerCase();
+  return normalized === INVALID_TEXT || normalized === "-";
+};
+
 const FALLBACK_STRINGS = {
   id: {
     invalidJson: "AI mengembalikan format JSON yang tidak valid.",
@@ -73,10 +108,12 @@ export function normalizeRouteResult(input, language = "id") {
     ? data.routes
     : [];
 
-  if (routes.length === 0) {
-    return {
-      clarification: strings.needDetail
-    };
+  const hasInvalidLocation =
+    isInvalidLocation(data.origin) ||
+    isInvalidLocation(data.destination);
+
+  if (hasInvalidLocation || routes.length === 0) {
+    return buildInvalidResult();
   }
 
   return {

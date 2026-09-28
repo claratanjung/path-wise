@@ -9,6 +9,13 @@ const BADGE_BY_LANGUAGE = {
   en: "Calculated via Google Maps"
 };
 
+const INVALID_TEXT = "data tidak sesuai";
+
+const isInvalidResult = (result) =>
+  [result?.origin, result?.destination].some(
+    (value) => String(value || "").trim().toLowerCase() === INVALID_TEXT
+  );
+
 function enrichRouteWithGoogleMaps(route, gmapsRoute, language) {
   if (!gmapsRoute?.steps?.length) return route;
 
@@ -57,6 +64,8 @@ export async function analyzeRoute(payload) {
   let result = normalizeRouteResult(raw, payload.language);
 
   if (result.clarification) return result;
+
+  if (isInvalidResult(result)) return result;
 
   result = await enrichWithGoogleMaps(result, payload.language);
 

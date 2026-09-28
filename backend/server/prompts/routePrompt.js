@@ -11,6 +11,8 @@ const LANGUAGE_NAMES = {
   en: "Inggris (English)"
 };
 
+const INVALID_TEXT = "data tidak sesuai";
+
 export function buildSystemPrompt({ preferences = [], language = "id" }) {
   const prefText = preferences.length
     ? preferences.map((p) => PREFERENCE_LABELS[p] || p).join(", ")
@@ -23,6 +25,7 @@ export function buildSystemPrompt({ preferences = [], language = "id" }) {
     "Tugas utama: Menganalisis cerita perjalanan pengguna, mengekstrak titik awal dan tujuan secara presisi, dan memberikan rekomendasi rute terstruktur.\n\n" +
     `Preferensi pengguna: ${prefText}.\n\n` +
     "ATURAN KRITIKAL (WAJIB DIIKUTI):\n" +
+    "PRIORITAS TERTINGGI — VALIDASI KOTA ASAL & KOTA TUJUAN: Periksa input pengguna terlebih dahulu. Jika input TIDAK memuat kota asal DAN kota tujuan dengan jelas (misalnya hanya menyebut satu kota, tidak menyebut lokasi sama sekali, atau hanya Division/Soekarno-Hatta tanpa kota asal & tujuan yang dapat diasumsikan secara aman), maka JANGAN mengarang rute apa pun. Dalam kondisi tersebut, isi SELURUH field teks pada JSON (origin, destination, departureTime, budget, title, badge, modes, instruction, mode, duration, cost, transfers, walking, time) dengan teks persis \"" + INVALID_TEXT + "\". Tetap keluarkan JSON valid dengan 'routes' berisi 1 objek dan 'steps' berisi 1 objek (supaya format tidak rusak), dan seluruh nilainya \"" + INVALID_TEXT + "\". Teks \"" + INVALID_TEXT + "\" SELALU ditulis persis begitu dalam bahasa Indonesia, meskipun bahasa output diminta English. Jangan isi field 'clarification' pada kasus ini. Aturan ini berlaku di atas semua aturan lain.\n" +
     `0. BAHASA OUTPUT (SANGAT PENTING): Tulis SEMUA nilai teks pada JSON (origin, destination, departureTime, budget, title, badge, modes, instruction, mode, clarification, dsb) HANYA dalam bahasa ${languageName}. Jangan mencampur bahasa lain sama sekali — termasuk nama moda transportasi umum (contoh untuk bahasa Inggris: "Walk" bukan "Jalan kaki", "Transfer" bukan "Transit", "2 transfers" bukan "2 kali"). Nama resmi seperti "KRL", "MRT", "TransJakarta", dan nama stasiun/halte TETAP dipertahankan apa adanya karena merupakan nama diri.\n` +
     "1. EKSTRAKSI LOKASI AKURAT: Gunakan titik awal (origin) dan tujuan (destination) PERSIS seperti yang diminta pengguna.\n" +
     "2. LOGIKA TITIK TERDEKAT: Jika asal/tujuan adalah tempat umum/gedung, arahkan ke stasiun/halte terdekat.\n" +
