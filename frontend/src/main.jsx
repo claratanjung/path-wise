@@ -460,11 +460,6 @@ function App() {
     scrollToInput();
   };
 
-  // Konten rute (judul, moda, badge, langkah perjalanan, dll.) dihasilkan oleh
-  // AI di backend sesuai bahasa yang dikirim saat request. Supaya switch
-  // bahasa langsung konsisten ke semua teks tanpa perlu refresh manual, saat
-  // bahasa diganti dan sudah ada hasil rute yang tampil, kita minta ulang
-  // rute yang sama ke backend memakai bahasa yang baru dipilih.
   useEffect(() => {
     if (isFirstLangRender.current) {
       isFirstLangRender.current = false;
@@ -473,7 +468,6 @@ function App() {
     if (result) {
       searchRoute();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lang]);
 
   return (
